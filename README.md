@@ -2,9 +2,9 @@
 **A Sony/MAGIX Vegas Pro datamoshing script, using FFmpeg and Avidemux**
 
 ## Setup
-Download the latest [release](releases/) and unpack it into your ```C:\Users\<user>\Documents\Vegas Script Menu``` folder.
+Download the latest [release](../../releases/) and unpack it into your ```C:\Users\<user>\Documents\Vegas Script Menu``` folder.
 
-Two entries will be added in the ```Tools -> Scripting``` submenu in Vegas. If you use Sony Vegas <= 13, please use Datamosh, in the other case use Datamosh14.
+Two entries will be added in the ```Tools -> Scripting``` submenu in Vegas. If you use Sony Vegas <= 13, use Datamosh, otherwise use Datamosh14.
 
 
 ## Usage
