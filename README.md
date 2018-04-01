@@ -12,8 +12,8 @@ To use, make sure you have added some video or audio clips into Vegas' timeline.
 
 
 The datamoshing options are:
-- ```Frame block size```: the number of consecutive I-frames to repeat (1 is usually good)
-- ```Frame block repeat```: the number of times to duplicate the I-frames (from 10 to 100 is usually good)
+- ```Frame block size```: the number of consecutive P-frames to repeat (1 is usually good)
+- ```Frame block repeat```: the number of times to duplicate the P-frames (from 10 to 100 is usually good)
 
 
 If you need to report an error please open an issue on this repository.
