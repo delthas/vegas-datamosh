@@ -1,6 +1,15 @@
 # vegas-datamosh
 **A Sony/MAGIX Vegas Pro datamoshing script, using FFmpeg and Avidemux**
 
+## Description
+This script lets you do datamoshing, by repeating some P-frames multiple times. This adds weird movement to the video, and corrupts the video data because the next P-frames refer to invalid data. You just need to select a part of the timeline, then the script will render it, datamosh it with avidemux, and add the datamoshed result to the timeline. The script will repeat the P-frames at the beginning of the selection and simply append the next frames.
+
+Since an MPEG4 stream always starts with an I-frame, the script will use the frame before the frame at the start of the selection as the I-frame. So you probably don't want to start the selection on the same frame an event starts.
+
+Also, as always this kind of datamoshing works better when there is movement in the video in the frames that are repeated, i.e. at the beginning of the selection. Make sure to start the selection on frames with a lot of movement for best results.
+
+The script attempts to keep a very high video quality, by using uncompressed and very high bitrate formats. Obviously the result is not lossless but it should not be too pixelated.
+
 ## Setup
 Download the latest [release](../../releases/) and unpack it into your ```C:\Users\<user>\Documents\Vegas Script Menu``` folder.
 
