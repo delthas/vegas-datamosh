@@ -25,7 +25,7 @@ The datamoshing options are:
 - ```Frame block size```: the number of consecutive P-frames to repeat (from 1 to 5 is usually good)
 - ```Frame block repeat```: the number of times to duplicate the P-frames (from 5 to 50 is usually good)
 
-**Simply explained: this script repeats N P-frames M times. N is the ```Frame block size```, M is the  ```Frame block repeat```.
+**Simply explained: this script repeats N P-frames M times. N is the ```Frame block size```, M is the  ```Frame block repeat```.**
 
 If you need to report an error please open an issue on this repository.
 
