@@ -2,13 +2,14 @@
 // quickly and automatically.
 //
 // Author: delthas
-// Date: 2018-04-01
+// Date: 2018-04-02
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.0.0
+// Version: 1.0.1
 //
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
@@ -59,6 +60,22 @@ namespace VegasDatamosh {
 
     private static readonly byte[] Array4 = {0x00, 0x00, 0x00, 0x00};
 
+    private static void GetStandardTemplates(Vegas vegas) {
+      GetTemplate(vegas, 12000);
+      GetTemplate(vegas, 12500);
+      GetTemplate(vegas, 14000);
+      GetTemplate(vegas, 14985);
+      GetTemplate(vegas, 15000);
+      GetTemplate(vegas, 16000);
+      GetTemplate(vegas, 23976);
+      GetTemplate(vegas, 24000);
+      GetTemplate(vegas, 25000);
+      GetTemplate(vegas, 29970);
+      GetTemplate(vegas, 30000);
+      GetTemplate(vegas, 50000);
+      GetTemplate(vegas, 59940);
+      GetTemplate(vegas, 60000);
+    }
 
     private static RenderTemplate GetTemplate(Vegas vegas, int frameRate) {
       if (frameRate >= 100 * 1000) {
@@ -72,10 +89,12 @@ namespace VegasDatamosh {
       if (template != null) {
         return template;
       }
+
       var appData = Environment.GetEnvironmentVariable("APPDATA");
       if (appData == null) {
         throw new IOException("APPDATA not set!");
       }
+
       var folder = Path.Combine(appData, "Sony", "Render Templates", "avi");
       Directory.CreateDirectory(folder);
       var file = Path.Combine(folder, name + ".sft2");
@@ -92,9 +111,10 @@ namespace VegasDatamosh {
         writer.Write(Array3, 0, Array3.Length);
         var chars = frameString.ToCharArray();
         foreach (var ch in chars) {
-          writer.Write((byte)ch);
-          writer.Write((byte)0x00);
+          writer.Write((byte) ch);
+          writer.Write((byte) 0x00);
         }
+
         writer.Write(Array4, 0, Array4.Length);
         return null;
       }
@@ -103,25 +123,55 @@ namespace VegasDatamosh {
     public void FromVegas(Vegas vegas) {
       var start = vegas.Transport.LoopRegionStart;
       var length = vegas.Transport.LoopRegionLength;
+
       try {
         var frameRate = vegas.Project.Video.FrameRate;
         var frameRateInt = (int) Math.Round(frameRate * 1000);
 
+        var scriptDirectory = Path.GetDirectoryName(Script.File);
+        if (scriptDirectory == null) {
+          MessageBox.Show("Couldn't get script directory path!");
+          return;
+        }
+
+        const string xvidCheckPath = @"C:\Program Files (x86)\Xvid\uninstall.exe";
+        if (!File.Exists(xvidCheckPath)) {
+          MessageBox.Show(
+            "Xvid codec not installed. The script will install it now and may ask for admin access to install it.");
+          var xvid = new Process {
+            StartInfo = {
+              UseShellExecute = true,
+              FileName = Path.Combine(scriptDirectory, "_internal", "xvid", "xvid.exe"),
+              WorkingDirectory = Path.Combine(scriptDirectory, "_internal"),
+              Arguments =
+                "--unattendedmodeui none  --mode unattended  --AutoUpdater no --decode_divx DIVX  --decode_3ivx 3IVX --decode_divx DIVX --decode_other MPEG-4",
+              CreateNoWindow = true,
+              Verb = "runas"
+            }
+          };
+          try {
+            xvid.Start();
+          }
+          catch (Win32Exception e) {
+            if (e.NativeErrorCode == 1223) {
+              MessageBox.Show("Admin privilege for Xvid installation refused.");
+              return;
+            }
+
+            throw;
+          }
+
+          xvid.WaitForExit();
+          GetStandardTemplates(vegas);
+          GetTemplate(vegas, frameRateInt);
+          MessageBox.Show(
+            "Xvid installed and render template generated for the current frame rate. Please restart Sony Vegas and run the script again.");
+          return;
+        }
+
         var template = GetTemplate(vegas, frameRateInt);
         if (template == null) {
-          GetTemplate(vegas, 12000);
-          GetTemplate(vegas, 12500);
-          GetTemplate(vegas, 14000);
-          GetTemplate(vegas, 14985);
-          GetTemplate(vegas, 15000);
-          GetTemplate(vegas, 23976);
-          GetTemplate(vegas, 24000);
-          GetTemplate(vegas, 25000);
-          GetTemplate(vegas, 29970);
-          GetTemplate(vegas, 30000);
-          GetTemplate(vegas, 50000);
-          GetTemplate(vegas, 59940);
-          GetTemplate(vegas, 60000);
+          GetStandardTemplates(vegas);
           GetTemplate(vegas, frameRateInt);
           MessageBox.Show(
             "Render template generated for the current frame rate. Please restart Sony Vegas and run the script again.");
@@ -134,9 +184,18 @@ namespace VegasDatamosh {
           Text = "Datamoshing Parameters"
         };
         var textLabel = new Label {Left = 10, Top = 10, Text = "Frame block size"};
-        var inputBox = new NumericUpDown {Left = 200, Top = 10, Width = 200, Value = 1, Minimum = 1, Maximum = 1000000000};
+        var inputBox =
+          new NumericUpDown {Left = 200, Top = 10, Width = 200, Value = 1, Minimum = 1, Maximum = 1000000000};
         var textLabel2 = new Label {Left = 10, Top = 40, Text = "Frame block repeats"};
-        var inputBox2 = new NumericUpDown {Left = 200, Top = 40, Width = 200, Value = 1, Minimum = 1, Maximum = 1000000000, Text = ""};
+        var inputBox2 = new NumericUpDown {
+          Left = 200,
+          Top = 40,
+          Width = 200,
+          Value = 1,
+          Minimum = 1,
+          Maximum = 1000000000,
+          Text = ""
+        };
         var confirmation = new Button {Text = "OK", Left = 200, Width = 100, Top = 70};
         confirmation.Click += (sender, e) => { prompt.Close(); };
         prompt.Controls.Add(confirmation);
@@ -247,11 +306,6 @@ namespace VegasDatamosh {
           "var size=" + size + ";",
           "var repeat=" + repeat + ";"
         };
-        var scriptDirectory = Path.GetDirectoryName(Script.File);
-        if (scriptDirectory == null) {
-          MessageBox.Show("Couldn't get script directory path!");
-          return;
-        }
 
         File.WriteAllLines(Path.Combine(scriptDirectory, "_internal", "config_datamosh.js"), datamoshConfig);
 
