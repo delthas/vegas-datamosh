@@ -1,4 +1,4 @@
-# vegas-datamosh
+# vegas-datamosh ![Github All Releases](https://img.shields.io/github/downloads/delthas/vegas-datamosh/total.svg?style=flat-square)
 **A pack of Sony/MAGIX Vegas Pro scripts for YTP (datamoshing, multilayering, ...), using FFmpeg and Avidemux**
 
 ## Setup
