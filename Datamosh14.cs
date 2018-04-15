@@ -2,11 +2,11 @@
 // quickly and automatically.
 //
 // Author: delthas
-// Date: 2018-04-14
+// Date: 2018-04-15
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.1.1
+// Version: 1.2.0
 //
 
 using System;

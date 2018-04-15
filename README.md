@@ -39,6 +39,13 @@ To use, make a selection in the timeline using I and O, then it will be rendered
 
 **The rendered file will support alpha/transparency, meaning you don't need to add a green screen and remove it after, the alpha is handled automatically.**
 
+### Scramble
+This simply scrambles multiple clips/events, by cutting them in subclips of length N, and shuffling the subclips. N is the ```Scramble size```, and is usually 1.
+
+To use, select several clips/events (they must be actually selected, not only in group-selected), then they will be scrambled automatically.
+
+*Clips starting and ending at the same time will be scrambled together, ie their subclips will be shuffled the same way.*
+
 ## Tips
 *On most script window prompts, pressing ```enter``` confirms and pressing ```space``` toggles the checkbox (if present) so you don't even need to use your mouse most of the times.*
 

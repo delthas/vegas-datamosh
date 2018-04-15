@@ -2,11 +2,11 @@
 // quickly and automatically.
 //
 // Author: delthas
-// Date: 2018-04-14
+// Date: 2018-04-15
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.1.1
+// Version: 1.2.0
 //
 
 using System;
@@ -213,7 +213,10 @@ namespace VegasLayering {
           Checked = defaultCheck
         };
         var confirmation = new Button {Text = "OK", Left = 200, Width = 100, Top = 100};
-        confirmation.Click += (sender, e) => { prompt.DialogResult = DialogResult.OK; prompt.Close(); };
+        confirmation.Click += (sender, e) => {
+          prompt.DialogResult = DialogResult.OK;
+          prompt.Close();
+        };
         prompt.KeyPress += (sender, args) => {
           if (args.KeyChar != ' ') return;
           inputBox3.Checked = !inputBox3.Checked;
@@ -231,6 +234,7 @@ namespace VegasLayering {
         if (prompt.ShowDialog() != DialogResult.OK) {
           return;
         }
+
         var count = (int) inputBox.Value;
         var offset = (int) inputBox2.Value;
         var render = inputBox3.Checked;
@@ -244,12 +248,13 @@ namespace VegasLayering {
           MessageBox.Show("Layer count must be > 0!");
           return;
         }
-        
+
         if (defaultCount != count) {
           Registry.SetValue(
             "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
             "LayerCount", count.ToString(), RegistryValueKind.String);
         }
+
         if (defaultCheck != render) {
           Registry.SetValue(
             "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
@@ -264,13 +269,15 @@ namespace VegasLayering {
         for (var i = videoTrackIndex - 1; i >= 0 && current < count; i--) {
           var videoTrack = vegas.Project.Tracks[i] as VideoTrack;
           if (videoTrack == null) continue;
-          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack, Timecode.FromFrames(videoEvent.Start.FrameCount + baseOffset + (++current) * offset)));
+          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack,
+            Timecode.FromFrames(videoEvent.Start.FrameCount + baseOffset + (++current) * offset)));
         }
 
         for (; current < count;) {
           var videoTrack = vegas.Project.AddVideoTrack();
           newTracks.Add(videoTrack);
-          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack, Timecode.FromFrames(videoEvent.Start.FrameCount + baseOffset + (++current) * offset)));
+          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack,
+            Timecode.FromFrames(videoEvent.Start.FrameCount + baseOffset + (++current) * offset)));
         }
 
         var start = videoEvent.Start;
@@ -301,6 +308,7 @@ namespace VegasLayering {
             MessageBox.Show("No folder selected");
             return;
           }
+
           finalFolder = dialog.FileName;
         }
 
@@ -342,6 +350,7 @@ namespace VegasLayering {
         foreach (var newEvent in newEvents) {
           newEvent.Track.Events.Remove(newEvent);
         }
+
         foreach (var newTrack in newTracks) {
           vegas.Project.Tracks.Remove(newTrack);
         }
