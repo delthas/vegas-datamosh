@@ -37,5 +37,8 @@ To use, make a selection in the timeline using I and O, then it will be rendered
 
 **The rendered file will support alpha/transparency, meaning you don't need to add a green screen and remove it after, the alpha is handled automatically.**
 
+## Tips
+*On most script window prompts, pressing ```enter``` confirms and pressing ```space``` toggles the checkbox (if present) so you don't even need to use your mouse most of the times.*
+
 ## License
 All the code is licensed under MIT. The releases include binaries of FFmpeg and Avidemux and the Xvid codec, which are under the LGPL+GPL and GPL and GPL licenses respectively.
