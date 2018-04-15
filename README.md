@@ -1,34 +1,41 @@
 # vegas-datamosh
-**A Sony/MAGIX Vegas Pro datamoshing script, using FFmpeg and Avidemux**
-
-## Description
-This script lets you do datamoshing, by repeating some P-frames multiple times. This adds weird movement to the video, and corrupts the video data because the next P-frames refer to invalid data. You just need to select a part of the timeline, then the script will render it, datamosh it with avidemux, and add the datamoshed result to the timeline. The script will repeat the P-frames at the beginning of the selection and simply append the next frames.
-
-Since an MPEG4 stream always starts with an I-frame, the script will use the frame before the frame at the start of the selection as the I-frame. So you probably don't want to start the selection on the same frame an event starts.
-
-Also, as always this kind of datamoshing works better when there is movement in the video in the frames that are repeated, i.e. at the beginning of the selection. Make sure to start the selection on frames with a lot of movement for best results.
-
-The script attempts to keep a very high video quality, by using uncompressed and very high bitrate formats. Obviously the result is not lossless but it should not be too pixelated.
+**A pack of Sony/MAGIX Vegas Pro scripts for YTP (datamoshing, multilayering, ...), using FFmpeg and Avidemux**
 
 ## Setup
-Download the latest [release](../../releases/) and unpack it into your ```C:\Users\<user>\Documents\Vegas Script Menu``` folder. (If the folder does not exist, create it.)
+Download the latest [release](../../releases/) **(the windows64.zip file)** and unpack it into your ```C:\Users\<user>\Documents\Vegas Script Menu``` folder. (If the folder does not exist, create it.)
 
-Two entries will be added in the ```Tools -> Scripting``` submenu in Vegas. If you use Sony Vegas <= 13, use Datamosh, otherwise use Datamosh14.
+Several entries will be added in the ```Tools -> Scripting``` submenu in Vegas. For each script, there will two entries, one of which is suffixed by "14" (for example, Datamosh and Datamosh14). If you use Sony Vegas <= 13, use the normal ones (eg Datamosh), otherwise use the ones suffixed by 14 (eg Datamosh14).
 
-You can add the datamoshing script as a toolbar button rather than having to click inside the ```Tools -> Scripting``` submenu, by adding it to the toolbar using the ```Options -> Customize Toolbar``` menu.
+You can add scripts as toolbar buttons rather than having to click inside the ```Tools -> Scripting``` submenu, by adding them to the toolbar using the ```Options -> Customize Toolbar``` menu.
 
-## Usage
-To use, make sure you have added some video or audio clips into Vegas' timeline. Then, choose the region you want to datamosh using the loop region selectors (press I in the timeline to start the selection and O to end it). Then start the script by clicking on it in ```Tools -> Scripting```. The script may ask you to restart Vegas the first time you use the plugin, and may ask you to choose the folder which will contain the generated datamoshed files. It will then let you choose some datamoshing options, then render and generate the file. On my computer the process takes about as long as the length of the part that is generated.
+**If Sony/MAGIX Vegas complains about not finding the Microsoft.WindowsAPICodePack.dll file, simply restart Vegas and it will work. It just happens from time to time and I don't know how to fix it yet.**
 
+**If you encounter any issue with the scripts, or you have any suggestion, please open an issue on this repository or contact me on Discord at ```cc#6439```.**
 
-The datamoshing options are:
-- ```Frame block size```: the number of consecutive P-frames to repeat (from 1 to 5 is usually good)
-- ```Frame block repeat```: the number of times to duplicate the P-frames (from 5 to 50 is usually good)
+## Scripts
 
-**Simply explained: this script repeats N P-frames M times. N is the ```Frame block size```, M is the  ```Frame block repeat```.**
+### Datamosh
+This repeats N P-frames M times. N is the ```Frame count```, M is the  ```Frame repeats```.
 
-If you need to report an error please open an issue on this repository.
+To use, make a selection in the timeline using I and O, then it will be rendered and datamoshed and added to your project, all in one click. It can take quite some time for long selections so wait if Vegas seems to freeze.
 
+The start of the selection is the first P-frame that will be repeated. The P-frame will be relative to the previous frame, which will be rendered as an I-frame. So for best results, the start of the selection should be a frame with a lot of movement.
+
+The end of the selection simply tells the script until which frame it should rendered the datamoshed file. The longer the selection, the longer the render time.
+
+### Layer
+This does multilayering, by copying the select video clip/event N times, each time offsetting the clip by M frames. N is the ```Layer count```, M is the  ```Layering offset```. You can also choose to automatically render the multilayered clip by checking the ```Render``` hitbox, otherwise the copies clips will simply be added to the timeline.
+
+To use, select a single video clip/event, then it will be multilayered automatically, and rendered transparently if specified.
+
+**If you choose to render automatically, the rendered file will support alpha/transparency, meaning you don't need to add a green screen and remove it after, the alpha is handled automatically.**
+
+### Render
+This simply renders a part of the timeline and places it into the timeline in a single click.
+
+To use, make a selection in the timeline using I and O, then it will be rendered and added to your project, all in one click.
+
+**The rendered file will support alpha/transparency, meaning you don't need to add a green screen and remove it after, the alpha is handled automatically.**
 
 ## License
 All the code is licensed under MIT. The releases include binaries of FFmpeg and Avidemux and the Xvid codec, which are under the LGPL+GPL and GPL and GPL licenses respectively.

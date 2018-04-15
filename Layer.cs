@@ -1,4 +1,4 @@
-﻿﻿// MAGIX Vegas (>=14) script to datamosh a part of a video
+﻿// Sony Vegas (<=13) script to do multilayering on a part of a video
 // quickly and automatically.
 //
 // Author: delthas
@@ -10,15 +10,15 @@
 //
 
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using ScriptPortal.Vegas;
+using Sony.Vegas;
 
-namespace VegasDatamosh {
+namespace VegasLayering {
   public class EntryPoint {
     private static readonly byte[] Array1 = {
       0x42, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -38,7 +38,7 @@ namespace VegasDatamosh {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc8, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x28,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     };
@@ -46,7 +46,7 @@ namespace VegasDatamosh {
     private static readonly byte[] Array3 = {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x44,
+      0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x20, 0x00, 0x44,
       0x49, 0x42, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -55,8 +55,8 @@ namespace VegasDatamosh {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55,
-      0x00, 0x6e, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x70, 0x00, 0x72, 0x00, 0x65, 0x00, 0x73, 0x00, 0x73, 0x00,
-      0x65, 0x00, 0x64, 0x00, 0x20, 0x00
+      0x00, 0x6e, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x70, 0x00, 0x72, 0x00, 0x41, 0x00, 0x6c, 0x00, 0x70, 0x00,
+      0x68, 0x00, 0x61, 0x00, 0x20, 0x00
     };
 
     private static readonly byte[] Array4 = {0x00, 0x00, 0x00, 0x00};
@@ -84,7 +84,7 @@ namespace VegasDatamosh {
       }
 
       var frameString = (frameRate / 1000).ToString("00") + "." + (frameRate % 1000).ToString("000");
-      var name = "Uncompressed " + frameString;
+      var name = "UncomprAlpha " + frameString;
       var template = vegas.Renderers.FindByRendererID(0).Templates
         .FindByName(name);
       if (template != null) {
@@ -122,8 +122,30 @@ namespace VegasDatamosh {
     }
 
     public void FromVegas(Vegas vegas) {
-      var start = vegas.Transport.LoopRegionStart;
-      var length = vegas.Transport.LoopRegionLength;
+      var videoTrackIndex = -1;
+      VideoTrack videoTrackStart = null;
+      VideoEvent videoEvent = null;
+      for (var i = 0; i < vegas.Project.Tracks.Count; i++) {
+        var track = vegas.Project.Tracks[i];
+        if (!track.IsVideo())
+          continue;
+        foreach (var trackEvent in track.Events) {
+          if (!trackEvent.Selected) continue;
+          if (videoEvent != null) {
+            MessageBox.Show("Only a single video event can be selected!");
+            return;
+          }
+
+          videoTrackIndex = i;
+          videoTrackStart = (VideoTrack) track;
+          videoEvent = (VideoEvent) trackEvent;
+        }
+      }
+
+      if (videoEvent == null) {
+        MessageBox.Show("Select a video event to be layered!");
+        return;
+      }
 
       try {
         var frameRate = vegas.Project.Video.FrameRate;
@@ -135,41 +157,6 @@ namespace VegasDatamosh {
           return;
         }
 
-        const string xvidCheckPath = @"C:\Program Files (x86)\Xvid\uninstall.exe";
-        if (!File.Exists(xvidCheckPath)) {
-          MessageBox.Show(
-            "Xvid codec not installed. The script will install it now and may ask for admin access to install it.");
-          var xvid = new Process {
-            StartInfo = {
-              UseShellExecute = true,
-              FileName = Path.Combine(scriptDirectory, "_internal", "xvid", "xvid.exe"),
-              WorkingDirectory = Path.Combine(scriptDirectory, "_internal"),
-              Arguments =
-                "--unattendedmodeui none  --mode unattended  --AutoUpdater no --decode_divx DIVX  --decode_3ivx 3IVX --decode_divx DIVX --decode_other MPEG-4",
-              CreateNoWindow = true,
-              Verb = "runas"
-            }
-          };
-          try {
-            xvid.Start();
-          }
-          catch (Win32Exception e) {
-            if (e.NativeErrorCode == 1223) {
-              MessageBox.Show("Admin privilege for Xvid installation refused.");
-              return;
-            }
-
-            throw;
-          }
-
-          xvid.WaitForExit();
-          GetStandardTemplates(vegas);
-          GetTemplate(vegas, frameRateInt);
-          MessageBox.Show(
-            "Xvid installed and render template generated for the current frame rate. Please restart Sony Vegas and run the script again.");
-          return;
-        }
-
         var template = GetTemplate(vegas, frameRateInt);
         if (template == null) {
           GetStandardTemplates(vegas);
@@ -178,14 +165,14 @@ namespace VegasDatamosh {
             "Render template generated for the current frame rate. Please restart Sony Vegas and run the script again.");
           return;
         }
-        
-        var frameCount = (string) Registry.GetValue(
+
+        var layeringCount = (string) Registry.GetValue(
           "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
-          "FrameCount", "");
+          "LayerCount", "");
         var defaultCount = 1;
-        if (frameCount != "") {
+        if (layeringCount != "") {
           try {
-            var value = int.Parse(frameCount);
+            var value = int.Parse(layeringCount);
             if (value > 0) {
               defaultCount = value;
             }
@@ -195,87 +182,104 @@ namespace VegasDatamosh {
           }
         }
 
+        var renderChecked = (string) Registry.GetValue(
+          "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
+          "RenderLayer", "");
+        var defaultCheck = renderChecked == "True";
         var prompt = new Form {
           Width = 500,
-          Height = 140,
-          Text = "Datamoshing Parameters"
+          Height = 170,
+          Text = "Layering Parameters",
+          KeyPreview = true
         };
-        var textLabel = new Label {Left = 10, Top = 10, Text = "Frame count"};
-        var inputBox =
-          new NumericUpDown {Left = 200, Top = 10, Width = 200, Value = defaultCount, Minimum = 1, Maximum = 1000000000};
-        var textLabel2 = new Label {Left = 10, Top = 40, Text = "Frames repeats"};
-        var inputBox2 = new NumericUpDown {
+        var textLabel = new Label {Left = 10, Top = 10, Text = "Layer count"};
+        var inputBox = new NumericUpDown {
           Left = 200,
-          Top = 40,
+          Top = 10,
           Width = 200,
-          Value = 1,
+          Value = defaultCount,
           Minimum = 1,
-          Maximum = 1000000000,
-          Text = ""
+          Maximum = 1000000000
         };
-        var confirmation = new Button {Text = "OK", Left = 200, Width = 100, Top = 70};
+        var textLabel2 = new Label {Left = 10, Top = 40, Text = "Layering offset"};
+        var inputBox2 =
+          new NumericUpDown {Left = 200, Top = 40, Width = 200, Minimum = 1, Text = "", Maximum = 1000000000};
+        var textLabel3 = new Label {Left = 10, Top = 70, Text = "Render"};
+        var inputBox3 = new CheckBox {
+          Left = 200,
+          Top = 70,
+          Width = 200,
+          Checked = defaultCheck
+        };
+        var confirmation = new Button {Text = "OK", Left = 200, Width = 100, Top = 100};
         confirmation.Click += (sender, e) => { prompt.DialogResult = DialogResult.OK; prompt.Close(); };
+        prompt.KeyPress += (sender, args) => {
+          if (args.KeyChar != ' ') return;
+          inputBox3.Checked = !inputBox3.Checked;
+          args.Handled = true;
+        };
         prompt.Controls.Add(confirmation);
         prompt.Controls.Add(textLabel);
         prompt.Controls.Add(inputBox);
         prompt.Controls.Add(textLabel2);
         prompt.Controls.Add(inputBox2);
+        prompt.Controls.Add(textLabel3);
+        prompt.Controls.Add(inputBox3);
         inputBox2.Select();
         prompt.AcceptButton = confirmation;
         if (prompt.ShowDialog() != DialogResult.OK) {
           return;
         }
-        var size = (int) inputBox.Value;
-        var repeat = (int) inputBox2.Value;
+        var count = (int) inputBox.Value;
+        var offset = (int) inputBox2.Value;
+        var render = inputBox3.Checked;
 
-        if (repeat <= 0) {
-          MessageBox.Show("Frames repeats must be > 0!");
+        if (offset <= 0) {
+          MessageBox.Show("Layering offset must be > 0!");
           return;
         }
 
-        if (length.FrameCount < size) {
-          MessageBox.Show("The selection must be as long as the frame count!");
-          return;
-        }
-
-        if (start.FrameCount < 1) {
-          MessageBox.Show("The selection mustn't start on the first frame of the project!");
+        if (count <= 0) {
+          MessageBox.Show("Layer count must be > 0!");
           return;
         }
         
-        if (defaultCount != size) {
+        if (defaultCount != count) {
           Registry.SetValue(
             "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
-            "FrameCount", size.ToString(), RegistryValueKind.String);
+            "LayerCount", count.ToString(), RegistryValueKind.String);
+        }
+        if (defaultCheck != render) {
+          Registry.SetValue(
+            "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
+            "RenderLayer", render.ToString(), RegistryValueKind.String);
         }
 
-        VideoTrack videoTrack = null;
-        for (var i = vegas.Project.Tracks.Count - 1; i >= 0; i--) {
-          videoTrack = vegas.Project.Tracks[i] as VideoTrack;
-          if (videoTrack != null) {
-            break;
-          }
+        var newTracks = new List<VideoTrack>();
+        var newEvents = new List<VideoEvent>();
+        var current = 0;
+
+        for (var i = videoTrackIndex - 1; i >= 0 && current < count; i--) {
+          var videoTrack = vegas.Project.Tracks[i] as VideoTrack;
+          if (videoTrack == null) continue;
+          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack, Timecode.FromFrames(videoEvent.Start.FrameCount + (++current) * offset)));
         }
 
-        AudioTrack audioTrack = null;
-        for (var i = 0; i < vegas.Project.Tracks.Count; i++) {
-          audioTrack = vegas.Project.Tracks[i] as AudioTrack;
-          if (audioTrack != null) {
-            break;
-          }
+        for (; current < count;) {
+          var videoTrack = vegas.Project.AddVideoTrack();
+          newTracks.Add(videoTrack);
+          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack, Timecode.FromFrames(videoEvent.Start.FrameCount + (++current) * offset)));
         }
 
-        if (videoTrack == null && audioTrack == null) {
-          MessageBox.Show("No tracks found!");
-          return;
-        }
-
+        if (!render) return;
         var changed = false;
         var finalFolder = (string) Registry.GetValue(
           "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
-          "ClipFolder", "");
+          "LayerClipFolder", "");
         while (string.IsNullOrEmpty(finalFolder) || !Directory.Exists(finalFolder)) {
-          MessageBox.Show("Select the folder to put generated datamoshed clips into.");
+          MessageBox.Show("Select the folder to put generated layered clips into.\n" +
+                          "(As they are stored uncompressed with alpha, they can take a lot of space (think 1 GB/minute). " +
+                          "Choose a location with a lot of available space and go remove some clips there if you need space.)");
           changed = true;
           var dialog = new CommonOpenFileDialog {
             IsFolderPicker = true,
@@ -283,21 +287,20 @@ namespace VegasDatamosh {
             EnsureFileExists = false,
             AllowNonFileSystemItems = false,
             DefaultFileName = "Select Folder",
-            Title = "Select the folder to put generated datamoshed clips into"
+            Title = "Select the folder to put generated layered clips into"
           };
 
           if (dialog.ShowDialog() != CommonFileDialogResult.Ok) {
             MessageBox.Show("No folder selected");
             return;
           }
-
           finalFolder = dialog.FileName;
         }
 
         if (changed) {
           Registry.SetValue(
             "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
-            "ClipFolder", finalFolder, RegistryValueKind.String);
+            "LayerClipFolder", finalFolder, RegistryValueKind.String);
         }
 
         var path = Path.Combine(vegas.TemporaryFilesPath, Path.GetFileNameWithoutExtension(vegas.Project.FilePath) +
@@ -307,17 +310,11 @@ namespace VegasDatamosh {
         var pathEncoded = Path.Combine(vegas.TemporaryFilesPath,
           Path.GetFileNameWithoutExtension(vegas.Project.FilePath) + "-" +
           Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8) + ".avi");
-        var pathDatamoshedBase = Path.Combine(finalFolder,
-          Path.GetFileNameWithoutExtension(vegas.Project.FilePath) + "-" +
-          Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8));
-        var pathDatamoshed = pathDatamoshedBase + ".avi";
-        var pathEncodedEscape = pathEncoded.Replace("\\", "/");
-        var pathDatamoshedEscape = pathDatamoshed.Replace("\\", "/");
 
         var renderArgs = new RenderArgs {
           OutputFile = path,
-          Start = Timecode.FromFrames(start.FrameCount - 1),
-          Length = Timecode.FromFrames(length.FrameCount + 1),
+          Start = Timecode.FromFrames(videoEvent.Start.FrameCount),
+          Length = Timecode.FromFrames(videoEvent.Length.FrameCount + count * offset),
           RenderTemplate = template
         };
         var status = vegas.Render(renderArgs);
@@ -326,85 +323,20 @@ namespace VegasDatamosh {
           return;
         }
 
-        string[] datamoshConfig = {
-          "var input=\"" + pathEncodedEscape + "\";",
-          "var output=\"" + pathDatamoshedEscape + "\";",
-          "var size=" + size + ";",
-          "var repeat=" + repeat + ";"
-        };
-
-        File.WriteAllLines(Path.Combine(scriptDirectory, "_internal", "config_datamosh.js"), datamoshConfig);
-
-        var encode = new Process {
-          StartInfo = {
-            UseShellExecute = false,
-            FileName = Path.Combine(scriptDirectory, "_internal", "ffmpeg", "ffmpeg.exe"),
-            WorkingDirectory = Path.Combine(scriptDirectory, "_internal"),
-            Arguments = "-hide_banner -nostdin -i \"" + path +
-                        "\" -c:v mpeg4 -vtag xvid -qscale:v 1 -bf 0 -g 600 -vtag xvid -c:a copy \"" + pathEncoded +
-                        "\"",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true
-          }
-        };
-        encode.Start();
-        var output = encode.StandardOutput.ReadToEnd();
-        var error = encode.StandardError.ReadToEnd();
-        Debug.WriteLine(output);
-        Debug.WriteLine("---------------------");
-        Debug.WriteLine(error);
-        encode.WaitForExit();
-
-        File.Delete(path);
-        File.Delete(path + ".sfl");
-
-        var datamosh = new Process {
-          StartInfo = {
-            UseShellExecute = false,
-            FileName = Path.Combine(scriptDirectory, "_internal", "avidemux", "avidemux2_cli.exe"),
-            WorkingDirectory = Path.Combine(scriptDirectory, "_internal"),
-            Arguments = "--nogui --run avidemux_datamosh.js",
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true
-          }
-        };
-        datamosh.Start();
-        datamosh.StandardInput.WriteLine("n");
-        output = datamosh.StandardOutput.ReadToEnd();
-        error = datamosh.StandardError.ReadToEnd();
-        Debug.WriteLine(output);
-        Debug.WriteLine("---------------------");
-        Debug.WriteLine(error);
-        datamosh.WaitForExit();
-
-        File.Delete(pathEncoded);
         File.Delete(pathEncoded + ".sfl");
 
-        var media = vegas.Project.MediaPool.AddMedia(pathDatamoshed);
-        media.TimecodeIn = Timecode.FromFrames(1);
+        var media = vegas.Project.MediaPool.AddMedia(path);
+        var newVideoEvent = videoTrackStart.AddVideoEvent(videoEvent.Start,
+          Timecode.FromFrames(videoEvent.Length.FrameCount + count * offset));
+        ((VideoStream) newVideoEvent.AddTake(media.GetVideoStreamByIndex(0)).MediaStream).AlphaChannel =
+          VideoAlphaType.Straight;
+        videoEvent.Track.Events.Remove(videoEvent);
 
-        VideoEvent videoEvent = null;
-        if (videoTrack != null) {
-          videoEvent =
-            videoTrack.AddVideoEvent(start, Timecode.FromFrames(1 + length.FrameCount + (repeat - 1) * size));
-          videoEvent.AddTake(media.GetVideoStreamByIndex(0));
+        foreach (var newEvent in newEvents) {
+          newEvent.Track.Events.Remove(newEvent);
         }
-
-        AudioEvent audioEvent = null;
-        if (audioTrack != null) {
-          audioEvent =
-            audioTrack.AddAudioEvent(start, Timecode.FromFrames(1 + length.FrameCount + (repeat - 1) * size));
-          audioEvent.AddTake(media.GetAudioStreamByIndex(0));
-        }
-
-        if (videoTrack != null && audioTrack != null) {
-          var group = new TrackEventGroup();
-          vegas.Project.Groups.Add(group);
-          group.Add(videoEvent);
-          group.Add(audioEvent);
+        foreach (var newTrack in newTracks) {
+          vegas.Project.Tracks.Remove(newTrack);
         }
       }
       catch (Exception e) {

@@ -2,12 +2,13 @@
 // quickly and automatically.
 //
 // Author: delthas
-// Date: 2018-04-02
+// Date: 2018-04-14
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.0.1
+// Version: 1.1.0
 //
+
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -177,16 +178,32 @@ namespace VegasDatamosh {
             "Render template generated for the current frame rate. Please restart Sony Vegas and run the script again.");
           return;
         }
+        
+        var frameCount = (string) Registry.GetValue(
+          "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
+          "FrameCount", "");
+        var defaultCount = 1;
+        if (frameCount != "") {
+          try {
+            var value = int.Parse(frameCount);
+            if (value > 0) {
+              defaultCount = value;
+            }
+          }
+          catch (Exception) {
+            // ignore
+          }
+        }
 
         var prompt = new Form {
           Width = 500,
           Height = 140,
           Text = "Datamoshing Parameters"
         };
-        var textLabel = new Label {Left = 10, Top = 10, Text = "Frame block size"};
+        var textLabel = new Label {Left = 10, Top = 10, Text = "Frame count"};
         var inputBox =
-          new NumericUpDown {Left = 200, Top = 10, Width = 200, Value = 1, Minimum = 1, Maximum = 1000000000};
-        var textLabel2 = new Label {Left = 10, Top = 40, Text = "Frame block repeats"};
+          new NumericUpDown {Left = 200, Top = 10, Width = 200, Value = defaultCount, Minimum = 1, Maximum = 1000000000};
+        var textLabel2 = new Label {Left = 10, Top = 40, Text = "Frames repeats"};
         var inputBox2 = new NumericUpDown {
           Left = 200,
           Top = 40,
@@ -197,7 +214,7 @@ namespace VegasDatamosh {
           Text = ""
         };
         var confirmation = new Button {Text = "OK", Left = 200, Width = 100, Top = 70};
-        confirmation.Click += (sender, e) => { prompt.Close(); };
+        confirmation.Click += (sender, e) => { prompt.DialogResult = DialogResult.OK; prompt.Close(); };
         prompt.Controls.Add(confirmation);
         prompt.Controls.Add(textLabel);
         prompt.Controls.Add(inputBox);
@@ -205,23 +222,31 @@ namespace VegasDatamosh {
         prompt.Controls.Add(inputBox2);
         inputBox2.Select();
         prompt.AcceptButton = confirmation;
-        prompt.ShowDialog();
+        if (prompt.ShowDialog() != DialogResult.OK) {
+          return;
+        }
         var size = (int) inputBox.Value;
         var repeat = (int) inputBox2.Value;
 
         if (repeat <= 0) {
-          MessageBox.Show("Frame block repeats must be > 0!");
+          MessageBox.Show("Frames repeats must be > 0!");
           return;
         }
 
         if (length.FrameCount < size) {
-          MessageBox.Show("The selection must be as long as the frame block size!");
+          MessageBox.Show("The selection must be as long as the frame count!");
           return;
         }
 
         if (start.FrameCount < 1) {
           MessageBox.Show("The selection mustn't start on the first frame of the project!");
           return;
+        }
+        
+        if (defaultCount != size) {
+          Registry.SetValue(
+            "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
+            "FrameCount", size.ToString(), RegistryValueKind.String);
         }
 
         VideoTrack videoTrack = null;
@@ -250,6 +275,7 @@ namespace VegasDatamosh {
           "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
           "ClipFolder", "");
         while (string.IsNullOrEmpty(finalFolder) || !Directory.Exists(finalFolder)) {
+          MessageBox.Show("Select the folder to put generated datamoshed clips into.");
           changed = true;
           var dialog = new CommonOpenFileDialog {
             IsFolderPicker = true,
