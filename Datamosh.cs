@@ -6,7 +6,7 @@
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.2.0
+// Version: 1.2.1
 //
 
 using System;

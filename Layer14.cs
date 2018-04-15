@@ -6,7 +6,7 @@
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.2.0
+// Version: 1.2.1
 //
 
 using System;
@@ -17,7 +17,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Sony.Vegas;
+using ScriptPortal.Vegas;
 
 namespace VegasLayering {
   public class EntryPoint {
