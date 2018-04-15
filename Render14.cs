@@ -6,7 +6,7 @@
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.1.0
+// Version: 1.1.1
 //
 
 using System;
@@ -16,7 +16,7 @@ using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using ScriptPortal.Vegas;
+using Sony.Vegas;
 
 namespace VegasRender {
   public class EntryPoint {

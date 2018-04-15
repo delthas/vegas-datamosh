@@ -28,6 +28,8 @@ This does multilayering, by copying the select video clip/event N times, each ti
 
 To use, select a single video clip/event, then it will be multilayered automatically, and rendered transparently if specified.
 
+*You can use a negative offset (eg -2 instead of 2), in which case the newest clips/events will be added at the back, instead of the front of the previous events.*
+
 **If you choose to render automatically, the rendered file will support alpha/transparency, meaning you don't need to add a green screen and remove it after, the alpha is handled automatically.**
 
 ### Render

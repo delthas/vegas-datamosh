@@ -6,7 +6,7 @@
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.1.0
+// Version: 1.1.1
 //
 
 using System;
@@ -16,7 +16,7 @@ using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using ScriptPortal.Vegas;
+using Sony.Vegas;
 
 namespace VegasDatamosh {
   public class EntryPoint {
@@ -202,7 +202,7 @@ namespace VegasDatamosh {
         };
         var textLabel = new Label {Left = 10, Top = 10, Text = "Frame count"};
         var inputBox =
-          new NumericUpDown {Left = 200, Top = 10, Width = 200, Value = defaultCount, Minimum = 1, Maximum = 1000000000};
+          new NumericUpDown {Left = 200, Top = 10, Width = 200, Minimum = 1, Maximum = 1000000000, Value = defaultCount};
         var textLabel2 = new Label {Left = 10, Top = 40, Text = "Frames repeats"};
         var inputBox2 = new NumericUpDown {
           Left = 200,

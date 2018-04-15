@@ -6,7 +6,7 @@
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.1.0
+// Version: 1.1.1
 //
 
 using System;
@@ -14,9 +14,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using ScriptPortal.Vegas;
+using Sony.Vegas;
 
 namespace VegasLayering {
   public class EntryPoint {
@@ -197,13 +198,13 @@ namespace VegasLayering {
           Left = 200,
           Top = 10,
           Width = 200,
-          Value = defaultCount,
           Minimum = 1,
-          Maximum = 1000000000
+          Maximum = 1000000000,
+          Value = defaultCount
         };
         var textLabel2 = new Label {Left = 10, Top = 40, Text = "Layering offset"};
         var inputBox2 =
-          new NumericUpDown {Left = 200, Top = 40, Width = 200, Minimum = 1, Text = "", Maximum = 1000000000};
+          new NumericUpDown {Left = 200, Top = 40, Width = 200, Minimum = -1000000000, Maximum = 1000000000, Text = ""};
         var textLabel3 = new Label {Left = 10, Top = 70, Text = "Render"};
         var inputBox3 = new CheckBox {
           Left = 200,
@@ -234,8 +235,8 @@ namespace VegasLayering {
         var offset = (int) inputBox2.Value;
         var render = inputBox3.Checked;
 
-        if (offset <= 0) {
-          MessageBox.Show("Layering offset must be > 0!");
+        if (offset == 0) {
+          MessageBox.Show("Layering offset must not be 0!");
           return;
         }
 
@@ -258,17 +259,23 @@ namespace VegasLayering {
         var newTracks = new List<VideoTrack>();
         var newEvents = new List<VideoEvent>();
         var current = 0;
+        var baseOffset = offset > 0 ? 0 : -count * offset;
 
         for (var i = videoTrackIndex - 1; i >= 0 && current < count; i--) {
           var videoTrack = vegas.Project.Tracks[i] as VideoTrack;
           if (videoTrack == null) continue;
-          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack, Timecode.FromFrames(videoEvent.Start.FrameCount + (++current) * offset)));
+          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack, Timecode.FromFrames(videoEvent.Start.FrameCount + baseOffset + (++current) * offset)));
         }
 
         for (; current < count;) {
           var videoTrack = vegas.Project.AddVideoTrack();
           newTracks.Add(videoTrack);
-          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack, Timecode.FromFrames(videoEvent.Start.FrameCount + (++current) * offset)));
+          newEvents.Add((VideoEvent) videoEvent.Copy(videoTrack, Timecode.FromFrames(videoEvent.Start.FrameCount + baseOffset + (++current) * offset)));
+        }
+
+        var start = videoEvent.Start;
+        if (offset < 0) {
+          videoEvent.Start = Timecode.FromFrames(videoEvent.Start.FrameCount + baseOffset);
         }
 
         if (!render) return;
@@ -313,8 +320,8 @@ namespace VegasLayering {
 
         var renderArgs = new RenderArgs {
           OutputFile = path,
-          Start = Timecode.FromFrames(videoEvent.Start.FrameCount),
-          Length = Timecode.FromFrames(videoEvent.Length.FrameCount + count * offset),
+          Start = Timecode.FromFrames(start.FrameCount),
+          Length = Timecode.FromFrames(videoEvent.Length.FrameCount + count * Math.Abs(offset)),
           RenderTemplate = template
         };
         var status = vegas.Render(renderArgs);
@@ -326,8 +333,8 @@ namespace VegasLayering {
         File.Delete(pathEncoded + ".sfl");
 
         var media = vegas.Project.MediaPool.AddMedia(path);
-        var newVideoEvent = videoTrackStart.AddVideoEvent(videoEvent.Start,
-          Timecode.FromFrames(videoEvent.Length.FrameCount + count * offset));
+        var newVideoEvent = videoTrackStart.AddVideoEvent(start,
+          Timecode.FromFrames(videoEvent.Length.FrameCount + count * Math.Abs(offset)));
         ((VideoStream) newVideoEvent.AddTake(media.GetVideoStreamByIndex(0)).MediaStream).AlphaChannel =
           VideoAlphaType.Straight;
         videoEvent.Track.Events.Remove(videoEvent);
