@@ -1,6 +1,9 @@
 # vegas-datamosh ![Github All Releases](https://img.shields.io/github/downloads/delthas/vegas-datamosh/total.svg?style=flat-square)
 **A pack of Sony/MAGIX Vegas Pro scripts for YTP (datamoshing, multilayering, ...), using FFmpeg and Avidemux**
 
+## News
+- **1.3.0**: Added Automator (randomizes video effects)
+
 ## Setup
 Download the latest [release](../../releases/) **(the windows64.zip file)** and unpack it into your ```C:\Users\<user>\Documents\Vegas Script Menu``` folder. (If the folder does not exist, create it.)
 
@@ -45,6 +48,13 @@ This simply scrambles multiple clips/events, by cutting them in subclips of leng
 To use, select several clips/events (they must be actually selected, not only in group-selected), then they will be scrambled automatically.
 
 *Clips starting and ending at the same time will be scrambled together, ie their subclips will be shuffled the same way.*
+
+### Automator
+This randomizes the video effects of selected clips/events, by adding random keyframes every frame for each parameter type you select.
+
+To use, select several clips/events which have video effects on them (they must be actually selected, not only in group-selected), then start the script. For each type of video effect parameter on any of the clips, you will be prompted for whether you want the script to *scramble* the parameter (replace all the current keyframes of the parameter with random keyframes), or not (leave the keyframes as is).
+
+**Only *OFX* video effects are supported (newsprint, mirror, ...); they all have the same look, it's easy to identify which effects are OFX. Other effects are ignored.**
 
 ## Tips
 *On most script window prompts, pressing ```enter``` confirms and pressing ```space``` toggles the checkbox (if present) so you don't even need to use your mouse most of the time.*

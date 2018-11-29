@@ -3,11 +3,11 @@
 // quickly and automatically.
 //
 // Author: delthas
-// Date: 2018-04-01
+// Date: 2018-11-29
 // License: MIT
 // Source: https://github.com/delthas/vegas-datamosh
 // Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.0.0
+// Version: 1.3.0
 //
 include("config_datamosh.js");
 var app = new Avidemux();
