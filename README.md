@@ -2,6 +2,7 @@
 **A pack of Sony/MAGIX Vegas Pro scripts for YTP (datamoshing, multilayering, ...), using FFmpeg and Avidemux**
 
 ## News
+- **1.4.0**: Added Datamix (datamosh: apply a clip P-frames on another clip I-frame)
 - **1.3.0**: Added Automator (randomizes video effects)
 
 ## Setup
@@ -24,7 +25,18 @@ To use, make a selection in the timeline using I and O, then it will be rendered
 
 The start of the selection is the first P-frame that will be repeated. The P-frame will be relative to the previous frame, which will be rendered as an I-frame. So for best results, the start of the selection should be a frame with a lot of movement.
 
-The end of the selection simply tells the script until which frame it should rendered the datamoshed file. The longer the selection, the longer the render time.
+The end of the selection simply tells the script until which frame it should render the datamoshed file. The longer the selection, the longer the render time.
+
+### Datamix
+This replaces the first I-frames of a clip by a frame of another clip.
+
+To use, make a selection in the timeline using I and O, then it will be rendered and datamixed and added to your project, all in one click. It can take quite some time for long selections so wait if Vegas seems to freeze.
+
+The start of the selection is the I-frame of the clip that will be replaced by another I-frame. *The image used for the new I-frame will be the frame just before the start of the selection.* So make sure to place the image you want to datamix from, just before the selection start.
+
+If you want to datamix on a scene change, you can typically split the clip at the exact frame where the scene changes, and select the right clip. This will datamix the right-hand side clip onto the last frame of the left-hand side clip.
+
+The end of the selection simply tells the script until which frame it should render the datamoshed file. The longer the selection, the longer the render time.
 
 ### Layer
 This does multilayering, by copying the select video clip/event N times, each time offsetting the clip by M frames. N is the ```Layer count```, M is the  ```Layering offset```. You can also choose to automatically render the multilayered clip by checking the ```Render``` hitbox, otherwise the copies clips will simply be added to the timeline.

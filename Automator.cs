@@ -1,12 +1,4 @@
-﻿// Sony Vegas (<=13) script to set random automation
-// values for video effects quickly and automatically.
-//
-// Author: delthas
-// Date: 2018-11-29
-// License: MIT
-// Source: https://github.com/delthas/vegas-datamosh
-// Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.3.0
+﻿// Sets random automation values for video effects quickly and automatically.
 //
 
 using System;
@@ -74,7 +66,7 @@ namespace VegasAutomator {
           var renderChecked = (string) Registry.GetValue(
             "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
             "Automate_" + hashed, "");
-          var defaultCheck = renderChecked == "True";
+          var defaultCheck = renderChecked != "False";
           
           var prompt = new Form {
             Width = 300,

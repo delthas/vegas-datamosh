@@ -1,12 +1,4 @@
-﻿﻿// Sony Vegas (<=13) script to datamosh a part of a video
-// quickly and automatically.
-//
-// Author: delthas
-// Date: 2018-11-29
-// License: MIT
-// Source: https://github.com/delthas/vegas-datamosh
-// Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.3.0
+﻿﻿// Datamoshes a part of a video quickly and automatically.
 //
 
 using System;
@@ -340,8 +332,8 @@ namespace VegasDatamosh {
             UseShellExecute = false,
             FileName = Path.Combine(scriptDirectory, "_internal", "ffmpeg", "ffmpeg.exe"),
             WorkingDirectory = Path.Combine(scriptDirectory, "_internal"),
-            Arguments = "-hide_banner -nostdin -i \"" + path +
-                        "\" -c:v mpeg4 -vtag xvid -qscale:v 1 -bf 0 -g 600 -vtag xvid -c:a copy \"" + pathEncoded +
+            Arguments = "-y -hide_banner -nostdin -i \"" + path +
+                        "\" -c:v libxvid -q:v 1 -g 1M -flags +mv4+qpel -mpeg_quant 1 -c:a copy \"" + pathEncoded +
                         "\"",
             RedirectStandardOutput = true,
             RedirectStandardError = true,

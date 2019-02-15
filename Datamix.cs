@@ -1,24 +1,16 @@
-﻿﻿// MAGIX Vegas (>=14) script to render a part of a video
-// quickly and automatically.
-//
-// Author: delthas
-// Date: 2018-11-29
-// License: MIT
-// Source: https://github.com/delthas/vegas-datamosh
-// Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.3.0
+﻿// Datamoshes a part of a video quickly and automatically (mosh a clip onto another).
 //
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using ScriptPortal.Vegas;
+using Sony.Vegas;
 
-namespace VegasRender {
+namespace VegasDatamix {
   public class EntryPoint {
     private static readonly byte[] Array1 = {
       0x42, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -38,7 +30,7 @@ namespace VegasRender {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc8, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x28,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     };
@@ -46,7 +38,7 @@ namespace VegasRender {
     private static readonly byte[] Array3 = {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x20, 0x00, 0x44,
+      0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x44,
       0x49, 0x42, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -55,8 +47,8 @@ namespace VegasRender {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55,
-      0x00, 0x6e, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x70, 0x00, 0x72, 0x00, 0x41, 0x00, 0x6c, 0x00, 0x70, 0x00,
-      0x68, 0x00, 0x61, 0x00, 0x20, 0x00
+      0x00, 0x6e, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x70, 0x00, 0x72, 0x00, 0x65, 0x00, 0x73, 0x00, 0x73, 0x00,
+      0x65, 0x00, 0x64, 0x00, 0x20, 0x00
     };
 
     private static readonly byte[] Array4 = {0x00, 0x00, 0x00, 0x00};
@@ -84,7 +76,7 @@ namespace VegasRender {
       }
 
       var frameString = (frameRate / 1000).ToString("00") + "." + (frameRate % 1000).ToString("000");
-      var name = "UncomprAlpha " + frameString;
+      var name = "Uncompressed " + frameString;
       var template = vegas.Renderers.FindByRendererID(0).Templates
         .FindByName(name);
       if (template != null) {
@@ -121,9 +113,50 @@ namespace VegasRender {
       }
     }
 
+    private void Encode(Vegas vegas, string scriptDirectory, RenderArgs renderArgs, string pathEncoded) {
+      var status = vegas.Render(renderArgs);
+      if (status != RenderStatus.Complete) {
+        MessageBox.Show("Unexpected render status: " + status);
+        return;
+      }
+
+      var encode = new Process {
+        StartInfo = {
+          UseShellExecute = false,
+          FileName = Path.Combine(scriptDirectory, "_internal", "ffmpeg", "ffmpeg.exe"),
+          WorkingDirectory = Path.Combine(scriptDirectory, "_internal"),
+          Arguments = "-y -hide_banner -nostdin -i \"" + renderArgs.OutputFile +
+                      "\" -c:v libxvid -q:v 1 -g 1M -flags +mv4+qpel -mpeg_quant 1 -c:a copy \"" + pathEncoded +
+                      "\"",
+          RedirectStandardOutput = true,
+          RedirectStandardError = true,
+          CreateNoWindow = true
+        }
+      };
+      encode.Start();
+      var output = encode.StandardOutput.ReadToEnd();
+      var error = encode.StandardError.ReadToEnd();
+      Debug.WriteLine(output);
+      Debug.WriteLine("---------------------");
+      Debug.WriteLine(error);
+      encode.WaitForExit();
+
+      File.Delete(renderArgs.OutputFile);
+      File.Delete(renderArgs.OutputFile + ".sfl");
+    }
+
     public void FromVegas(Vegas vegas) {
       var start = vegas.Transport.LoopRegionStart;
       var length = vegas.Transport.LoopRegionLength;
+
+      if (start.FrameCount == 0) {
+        MessageBox.Show("Selection must start at frame >= 1!");
+        return;
+      }
+      if (length.FrameCount <= 1) {
+        MessageBox.Show("Selection length must be > 1 frame!");
+        return;
+      }
 
       try {
         var frameRate = vegas.Project.Video.FrameRate;
@@ -135,6 +168,41 @@ namespace VegasRender {
           return;
         }
 
+        const string xvidCheckPath = @"C:\Program Files (x86)\Xvid\uninstall.exe";
+        if (!File.Exists(xvidCheckPath)) {
+          MessageBox.Show(
+            "Xvid codec not installed. The script will install it now and may ask for admin access to install it.");
+          var xvid = new Process {
+            StartInfo = {
+              UseShellExecute = true,
+              FileName = Path.Combine(scriptDirectory, "_internal", "xvid", "xvid.exe"),
+              WorkingDirectory = Path.Combine(scriptDirectory, "_internal"),
+              Arguments =
+                "--unattendedmodeui none  --mode unattended  --AutoUpdater no --decode_divx DIVX  --decode_3ivx 3IVX --decode_divx DIVX --decode_other MPEG-4",
+              CreateNoWindow = true,
+              Verb = "runas"
+            }
+          };
+          try {
+            xvid.Start();
+          }
+          catch (Win32Exception e) {
+            if (e.NativeErrorCode == 1223) {
+              MessageBox.Show("Admin privilege for Xvid installation refused.");
+              return;
+            }
+
+            throw;
+          }
+
+          xvid.WaitForExit();
+          GetStandardTemplates(vegas);
+          GetTemplate(vegas, frameRateInt);
+          MessageBox.Show(
+            "Xvid installed and render template generated for the current frame rate. Please restart Sony Vegas and run the script again.");
+          return;
+        }
+
         var template = GetTemplate(vegas, frameRateInt);
         if (template == null) {
           GetStandardTemplates(vegas);
@@ -143,7 +211,7 @@ namespace VegasRender {
             "Render template generated for the current frame rate. Please restart Sony Vegas and run the script again.");
           return;
         }
-        
+
         VideoTrack videoTrack = null;
         for (var i = vegas.Project.Tracks.Count - 1; i >= 0; i--) {
           videoTrack = vegas.Project.Tracks[i] as VideoTrack;
@@ -152,27 +220,17 @@ namespace VegasRender {
           }
         }
 
-        AudioTrack audioTrack = null;
-        for (var i = 0; i < vegas.Project.Tracks.Count; i++) {
-          audioTrack = vegas.Project.Tracks[i] as AudioTrack;
-          if (audioTrack != null) {
-            break;
-          }
-        }
-
-        if (videoTrack == null && audioTrack == null) {
-          MessageBox.Show("No tracks found!");
+        if (videoTrack == null) {
+          MessageBox.Show("No track found!");
           return;
         }
 
         var changed = false;
         var finalFolder = (string) Registry.GetValue(
           "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
-          "RenderClipFolder", "");
+          "ClipFolder", "");
         while (string.IsNullOrEmpty(finalFolder) || !Directory.Exists(finalFolder)) {
-          MessageBox.Show("Select the folder to put generated rendered clips into.\n" +
-                          "(As they are stored uncompressed with alpha, they can take a lot of space (think 1 GB/minute). " +
-                          "Choose a location with a lot of available space and go remove some clips there if you need space.)");
+          MessageBox.Show("Select the folder to put generated datamoshed clips into.");
           changed = true;
           var dialog = new CommonOpenFileDialog {
             IsFolderPicker = true,
@@ -180,68 +238,90 @@ namespace VegasRender {
             EnsureFileExists = false,
             AllowNonFileSystemItems = false,
             DefaultFileName = "Select Folder",
-            Title = "Select the folder to put generated rendered clips into"
+            Title = "Select the folder to put generated datamoshed clips into"
           };
 
           if (dialog.ShowDialog() != CommonFileDialogResult.Ok) {
             MessageBox.Show("No folder selected");
             return;
           }
+
           finalFolder = dialog.FileName;
         }
 
         if (changed) {
           Registry.SetValue(
             "HKEY_CURRENT_USER\\SOFTWARE\\Sony Creative Software\\Custom Presets",
-            "RenderClipFolder", finalFolder, RegistryValueKind.String);
+            "ClipFolder", finalFolder, RegistryValueKind.String);
         }
 
-        var path = Path.Combine(vegas.TemporaryFilesPath, Path.GetFileNameWithoutExtension(vegas.Project.FilePath) +
-                                                          "-" +
-                                                          Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8) +
-                                                          ".avi");
-        var pathEncoded = Path.Combine(vegas.TemporaryFilesPath,
+        var pathSrc = Path.Combine(vegas.TemporaryFilesPath, Path.GetFileNameWithoutExtension(vegas.Project.FilePath) + "-" +
+          Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8) + ".avi");
+        var pathEncodedSrc = Path.Combine(vegas.TemporaryFilesPath,
           Path.GetFileNameWithoutExtension(vegas.Project.FilePath) + "-" +
           Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8) + ".avi");
-
-        var renderArgs = new RenderArgs {
-          OutputFile = path,
-          Start = Timecode.FromFrames(start.FrameCount),
-          Length = Timecode.FromFrames(length.FrameCount),
+        Encode(vegas, scriptDirectory, new RenderArgs {
+          OutputFile = pathSrc,
+          Start = Timecode.FromFrames(start.FrameCount - 1),
+          Length = Timecode.FromFrames(1),
           RenderTemplate = template
+        }, pathEncodedSrc);
+        
+        var pathClip = Path.Combine(vegas.TemporaryFilesPath, Path.GetFileNameWithoutExtension(vegas.Project.FilePath) + "-" +
+                                                             Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8) + ".avi");
+        var pathEncodedClip = Path.Combine(vegas.TemporaryFilesPath,
+          Path.GetFileNameWithoutExtension(vegas.Project.FilePath) + "-" +
+          Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8) + ".avi");
+        Encode(vegas, scriptDirectory, new RenderArgs {
+          OutputFile = pathClip,
+          Start = start,
+          Length = length,
+          RenderTemplate = template
+        }, pathEncodedClip);
+
+        var pathDatamixed = Path.Combine(finalFolder,
+          Path.GetFileNameWithoutExtension(vegas.Project.FilePath) + "-" +
+          Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8)) + ".avi";
+
+        string[] datamoshConfig = {
+          "var input0=\"" + pathEncodedSrc.Replace("\\", "/") + "\";",
+          "var input1=\"" + pathEncodedClip.Replace("\\", "/") + "\";",
+          "var output=\"" + pathDatamixed.Replace("\\", "/") + "\";"
         };
-        var status = vegas.Render(renderArgs);
-        if (status != RenderStatus.Complete) {
-          MessageBox.Show("Unexpected render status: " + status);
-          return;
-        }
 
-        File.Delete(pathEncoded + ".sfl");
+        File.WriteAllLines(Path.Combine(scriptDirectory, "_internal", "config_datamix.js"), datamoshConfig);
 
-        var media = vegas.Project.MediaPool.AddMedia(path);
-        
-        VideoEvent videoEvent = null;
-        if (videoTrack != null) {
-          videoEvent =
-            videoTrack.AddVideoEvent(start, length);
-          ((VideoStream) videoEvent.AddTake(media.GetVideoStreamByIndex(0)).MediaStream).AlphaChannel =
-            VideoAlphaType.Straight;
-        }
+        var datamosh = new Process {
+          StartInfo = {
+            UseShellExecute = false,
+            FileName = Path.Combine(scriptDirectory, "_internal", "avidemux", "avidemux2_cli.exe"),
+            WorkingDirectory = Path.Combine(scriptDirectory, "_internal"),
+            Arguments = "--nogui --run avidemux_datamix.js",
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
+          }
+        };
+        datamosh.Start();
+        datamosh.StandardInput.WriteLine("n");
+        var output = datamosh.StandardOutput.ReadToEnd();
+        var error = datamosh.StandardError.ReadToEnd();
+        Debug.WriteLine(output);
+        Debug.WriteLine("---------------------");
+        Debug.WriteLine(error);
+        datamosh.WaitForExit();
 
-        AudioEvent audioEvent = null;
-        if (audioTrack != null) {
-          audioEvent =
-            audioTrack.AddAudioEvent(start, length);
-          audioEvent.AddTake(media.GetAudioStreamByIndex(0));
-        }
+        File.Delete(pathEncodedSrc);
+        File.Delete(pathEncodedSrc + ".sfl");
+        File.Delete(pathEncodedClip);
+        File.Delete(pathEncodedClip + ".sfl");
 
-        if (videoTrack != null && audioTrack != null) {
-          var group = new TrackEventGroup();
-          vegas.Project.Groups.Add(group);
-          group.Add(videoEvent);
-          group.Add(audioEvent);
-        }
-        
+        var media = vegas.Project.MediaPool.AddMedia(pathDatamixed);
+        media.TimecodeIn = Timecode.FromFrames(1);
+
+        var videoEvent = videoTrack.AddVideoEvent(start, Timecode.FromFrames(length.FrameCount - 1));
+        videoEvent.AddTake(media.GetVideoStreamByIndex(0));
       }
       catch (Exception e) {
         MessageBox.Show("Unexpected exception: " + e.Message);

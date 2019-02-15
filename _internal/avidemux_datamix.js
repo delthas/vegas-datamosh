@@ -1,20 +1,18 @@
 //AD
-// Datamoshes a part of a video quickly and automatically.
+// Datamosh a part of a video quickly and automatically (mosh a clip onto another).
 //
 
-include("config_datamosh.js");
+include("config_datamix.js");
 var app = new Avidemux();
-app.load(input);
+app.load(input1);
 var len = app.markerB+1;
+app.append(input0);
 app.clearSegments();
-app.addSegment(0,0,1);
-for (i = 0; i < repeat; i++) {
-    app.addSegment(0,1,size);
-}
-app.addSegment(0,1+size,len-1-size);
+app.addSegment(1,0,1);
+app.addSegment(0,1,len-1);
 
 app.markerA=0;
-app.markerB=len-1 + size*(repeat-1);
+app.markerB=len-1;
 
 app.setContainer("AVI");
 app.video.codec("copy","CQ=4","");

@@ -1,12 +1,4 @@
-﻿// Sony Vegas (<=13) script to scramble clips/events
-// quickly and automatically.
-//
-// Author: delthas
-// Date: 2018-11-29
-// License: MIT
-// Source: https://github.com/delthas/vegas-datamosh
-// Documentation: https://github.com/delthas/vegas-datamosh
-// Version: 1.3.0
+﻿// Scrambles clips/events quickly and automatically.
 //
 
 using System;
