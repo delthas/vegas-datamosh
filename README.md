@@ -5,6 +5,9 @@
 - **1.4.0**: Added Datamix (datamosh: apply a clip P-frames on another clip I-frame)
 - **1.3.0**: Added Automator (randomizes video effects)
 
+## Video tutorial
+[![youtube video tutorial](https://img.youtube.com/vi/6D2lW6H0bb8/0.jpg)](https://www.youtube.com/watch?v=6D2lW6H0bb8)
+
 ## Setup
 Download the latest [release](../../releases/) **(the windows64.zip file)** and unpack it into your ```C:\Users\<user>\Documents\Vegas Script Menu``` folder. (If the folder does not exist, create it.)
 
