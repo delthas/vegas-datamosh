@@ -127,8 +127,16 @@ namespace VegasDatamosh {
           return;
         }
 
-        const string xvidCheckPath = @"C:\Program Files (x86)\Xvid\uninstall.exe";
-        if (!File.Exists(xvidCheckPath)) {
+        var xvidPath = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
+        if (string.IsNullOrEmpty(xvidPath)) {
+          xvidPath = Environment.GetEnvironmentVariable("ProgramFiles");
+        }
+        if (string.IsNullOrEmpty(xvidPath)) {
+          MessageBox.Show("Couldn't get Xvid install path!");
+          return;
+        }
+        xvidPath += @"\Xvid\uninstall.exe";
+        if (!File.Exists(xvidPath)) {
           MessageBox.Show(
             "Xvid codec not installed. The script will install it now and may ask for admin access to install it.");
           var xvid = new Process {

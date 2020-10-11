@@ -188,13 +188,10 @@ namespace VegasRender {
             "RenderClipFolder", finalFolder, RegistryValueKind.String);
         }
 
-        var path = Path.Combine(vegas.TemporaryFilesPath, Path.GetFileNameWithoutExtension(vegas.Project.FilePath) +
+        var path = Path.Combine(finalFolder, Path.GetFileNameWithoutExtension(vegas.Project.FilePath) +
                                                           "-" +
                                                           Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8) +
                                                           ".avi");
-        var pathEncoded = Path.Combine(vegas.TemporaryFilesPath,
-          Path.GetFileNameWithoutExtension(vegas.Project.FilePath) + "-" +
-          Guid.NewGuid().ToString("B").ToUpper().Substring(1, 8) + ".avi");
 
         var renderArgs = new RenderArgs {
           OutputFile = path,
@@ -208,7 +205,7 @@ namespace VegasRender {
           return;
         }
 
-        File.Delete(pathEncoded + ".sfl");
+        File.Delete(path + ".sfl");
 
         var media = vegas.Project.MediaPool.AddMedia(path);
         
